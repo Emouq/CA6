@@ -52,7 +52,7 @@ teta= tetas[1] + sigma*np.sqrt(np.pi)*t   #not a white gaussian noise => raise l
 
 # Firing-rate
 
-r=rmin +(rmax-rmin)*((k*np.exp(np.cos(tetai-teta))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
+r=rmin +(rmax-rmin)*((np.exp(k*np.cos(tetai-teta))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
 
 
 # Plot the result 
@@ -79,7 +79,7 @@ for i in range ( len(tfixation) -  1 ):
 tcue = np.linspace (0, 0.5, int(0.5/0.001)) 
 
 rcue = np.zeros( len(tcue) )     #create a list of fixed value of rcue, of size tcue
-rcue[0]=rmin +(rmax-rmin)*((k*np.exp(np.cos(tetai-tetas[1]))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
+rcue[0]=rmin +(rmax-rmin)*((np.exp(k*np.cos(tetai-tetas[1]))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
 for i in range ( len(tcue) -  1 ):
     rcue[i+1] = rcue[i]           # not continous, add a transition from rfixation to rcue?  !!!
 
@@ -88,7 +88,7 @@ for i in range ( len(tcue) -  1 ):
 tdelay = np.linspace (0, 3, int(3/0.001))  
 tetadelay= tetas[1] + sigma*np.sqrt(np.pi)*tdelay    #not a white gaussian noise !!!
 
-rdelay=rmin +(rmax-rmin)*((k*np.exp(np.cos(tetai-tetadelay))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
+rdelay=rmin +(rmax-rmin)*((np.exp(k*np.cos(tetai-tetadelay))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
 #not continous, it has to vary around rcue: replace rmin or rmax by rcue[len(tcue)-1]  doesn't work. Only change between rdelay and rcue: tetadelay is replaced by tetas. So, in order to have rdelay=rcue at t=O, tdelay[0] has to be =0 and not =1.5
 
 
