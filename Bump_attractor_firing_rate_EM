@@ -1,0 +1,45 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy as sp
+
+# Parameters of the distribution
+nb_neurons = 200
+w0 = 35
+k0 = 180**2 / (np.pi**2 * w0**2)
+k = k0
+rmin = np.random.normal(7, 1, nb_neurons) #liste des rmin pour chaque neurone parmi les 200 neurones
+rmax = np.random.normal(14, 3.4, nb_neurons)
+
+# Parameters for each neuron i
+rmin_i = rmin[i]
+rmax_i = rmax[i]
+theta_i # il faut d'abord déterminer la preferred location du neurone i
+
+# For each trial
+thetas=[0,45,90,135,180,225,270,315]
+theta_signal # il faut d'abord déterminer le lieu du signal parmi thetas
+
+## Time evolution
+deltat = 0.001
+T = 3.
+t = np.linspace (0, T, int(T/deltat))
+
+## Compute theta
+heta = np.random.normal(0,1,len(t)) #heta est une liste de len(t) valeurs selectionnées au hasard dans une disytribution normale
+theta = []
+theta.append(theta_signal)
+for step in len(t):
+  theta[step] = deltat * sigma * heta[step] + theta[step-1]
+  theta.append(theta[step])
+
+# For each neuron for one trial
+for step in len(t):
+    lambda_i = rmin_i + (rmax_i - rmin_i ) * ((np.exp(k*np.cos(theta_i - theta[step]))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
+
+# For all neurons for one trial
+for i in range(200):
+    rmin_i = rmin[i]
+    rmax_i = rmax[i]
+    theta_i = # il faut d'abord déterminer la preferred location du neurone i
+    for step in len(t):
+        lambda_i = rmin_i + (rmax_i - rmin_i ) * ((np.exp(k*np.cos(theta_i - theta[step]))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
