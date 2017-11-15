@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
+import networkx as nx
+import scipy.linalg
+
+# FIRING RATE
 
 # Parameters of the distribution
 nb_neurons = 200
@@ -9,11 +13,12 @@ k0 = 180**2 / (np.pi**2 * w0**2)
 k = k0
 rmin = np.random.normal(7, 1, nb_neurons) #liste des rmin pour chaque neurone parmi les 200 neurones
 rmax = np.random.normal(14, 3.4, nb_neurons)
+theta_neurons = range(nb_neurons)/(nb_neurons*2*np.pi)
 
 # Parameters for each neuron i
 rmin_i = rmin[i]
 rmax_i = rmax[i]
-theta_i # il faut d'abord déterminer la preferred location du neurone i
+theta_i = theta_neurons[i] # preferred location du neurone i
 
 # For each trial
 thetas=[0,45,90,135,180,225,270,315]
@@ -43,3 +48,47 @@ for i in range(200):
     theta_i = # il faut d'abord déterminer la preferred location du neurone i
     for step in len(t):
         lambda_i = rmin_i + (rmax_i - rmin_i ) * ((np.exp(k*np.cos(theta_i - theta[step]))-np.exp(-k0))/(np.exp(k0)-np.exp(-k0)))
+
+# NETWORK
+
+number_excitatory_neurons = 512
+number_inhibitory_neurons = 512
+
+Im = 0
+Ie0par=0.5
+Ii0par=0.2
+GEE=6	 	# strength of excitation to excitatory neurons
+GEI=4		# strength of excitation to inhibitory neurons
+GIE=3.4
+GII=0.85
+sigmae=1
+sigmai=3
+
+
+Ie0=(np.zeros((512,512))+1)*Ie0par   #initial current for excitatory neurons
+Ii0=(np.zeros((512,512))+1)*Ii0par   #initial current for inhibitory neurons
+rE = np.zeros((number_excitatory_neurons,1))
+rI = np.zeros((number_inhibitory_neurons,1))
+
+# Input-output function
+def transfer(x):
+    if x>0 and x<1:
+        x=x*x
+    if x>=1:
+        x=np.sqrt(4*x-3)
+
+# Noise
+
+white_Gaussian_noise = np.random.normal(0,1,len(t))
+noiseE = sigmae * white_Gaussian_noise
+noiseI = sigmai * white_Gaussian_noise
+
+# Circulant Gaussian
+v = exp(k0*cos(theta_neurons))
+v = v/sum(v)
+from scipy.linalg import circulant
+WEE = circulant(v)
+
+### draft
+Ie=GEE*WEE*rE+np.ones(512,1)*(-GEI*mean(rI)+Ie0+Im)
+Ii=GIE*WIE-GII*WII+Ii0
