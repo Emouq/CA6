@@ -45,6 +45,11 @@ WII=WIE
 WEI=WIE
 
 WEE=                       #circular Gaussian function of i – j        !!!
+theta_neurons = range(nb_neurons)/(nb_neurons*2*np.pi)
+v = exp(k0*cos(theta_neurons))
+v = v/sum(v)
+from scipy.linalg import circulant
+WEE = circulant(v)
 
 Ie0=(np.zeros((512,512))+1)*Ie0par   #initial current for excitatory neurons
 Ii0=(np.zeros((512,512))+1)*Ii0par   #initial current for inhibitory neurons
