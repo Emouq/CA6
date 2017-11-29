@@ -9,7 +9,8 @@ import scipy.linalg
 ## time
 total_Time = 5000 # total time of the simulation in ms (cf. Fig 1.a)
 dt = 2 # integration step in ms
-nsteps = np.floor(total_Time/dt)
+nsteps = int(np.floor(total_Time/dt))
+t = [x*dt for x in range(nsteps)]
 
 ## cue
 npop = 8 # number of cues presented
@@ -18,15 +19,15 @@ cue_number = 3 # to be changed
 
 # Firing rate
 N = 512 # number of neurons in the rate model (512 excitatory neurons and 512 inhibitory neurons)
-thetas_preferred = [x*2*pi/N for x in range(N)] # list of prefered angles for the N neurons
-rE = np.zreos(N)
+thetas_preferred = [x*2*np.pi/N for x in range(N)] # list of prefered angles for the N neurons
+rE = np.zeros(N)
 rI = np.zeros(N)
 
 # Connectivity matrices
 
 ## Connectivity matrix among excitatory neurons
-GEE=6	 	# strength of excitation to excitatory neurons
-GEI=4		# strength of excitation to inhibitory neurons
+GEE=6
+GEI=4
 GIE=3.4
 GII=0.85
 
@@ -59,7 +60,7 @@ def transfer(x):
         x=x*x
     if x>=1:
         x=np.sqrt(4*x-3)
-
+    return x
 
 # Simultaion
 
@@ -71,30 +72,38 @@ stim = 200  	# strength of external stimulus
 delayend=4500	# time when delay ends in ms, and external input is applied to erase memory
 
 x_cue = N/npop*cue_number
-stimulus = stim * [1/(sigma*np.sqrt(2*np.pi))*np.exp(-(x-x_cue)**2/(2*sigma**2)) for x in range(N)] # distribution gaussienne centrée sur le cue
+stimulus = [stim*1/(sigma*np.sqrt(2*np.pi))*np.exp(-(x-x_cue)**2/(2*sigma**2)) for x in range(N)] # distribution gaussienne centrée sur le cue
 
 
 ## Simulation loop
 
+mean_rE = np.zeros(nsteps)
+
 for k in range(nsteps):
 
-    # addaitive noise for each population
+    # additive noise for each population
     white_Gaussian_noise = np.random.normal(0,1,N)
     noiseE = sigmae * white_Gaussian_noise
     noiseI = sigmai * white_Gaussian_noise
 
     # current input to each population
-    IE = GEE*np.dot(WE,rE) + (I0E - np.dot(WIE,rI))  # np.dot est le fonction du produit matriciel
-    IE = np.dot(WEI,rE) + I0I - np.dot(WII,rI))
+    IE = GEE*np.dot(WEE,rE) + (I0E - np.dot(WIE,rI))  # np.dot est le fonction du produit matriciel
+    II = np.dot(WEI,rE) + I0I - np.dot(WII,rI)
 
     # external task-dependent inputs
-    if i > stimon and i < stimoff:
+    if k > stimon and k < stimoff:
         IE = IE + stimulus # "incresased current input to subset of neurons theta_i near stimulus location theta_s"
 
-    ?????
+    if k > delayend:
+        IE = IE - stimulus
 
     # integration with time-step: Newton method
-    rE = rE + (transfer(IE) - rE + noiseE) * dt/tauE
-    rI = rI + (transfer(II) - rI + noiseI) * dt/tauI
+    for i in range(N):
+        rE[i] = rE[i] + (transfer(IE[i]) - rE[i] + noiseE[i]) * dt/tauE
+        rI[i] = rI[i] + (transfer(II[i]) - rI[i] + noiseI[i]) * dt/tauI
 
-## Graphical outputs
+    mean_rE[k] = np.mean(rE[0:3*64])
+    # graphic
+
+plt.plot(t,mean_rE,'r')
+plt.show()
